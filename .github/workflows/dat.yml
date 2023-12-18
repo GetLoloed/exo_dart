@@ -1,0 +1,35 @@
+name: Dart CI
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        dart_version: [ 'stable', 'dev' ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: ${{ matrix.dart_version }}
+
+      - name: Print Dart SDK version
+        run: dart --version
+
+      - name: Restore dependencies
+        run: dart pub get
+
+      - name: Check format
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Static analyze
+        run: dart analyze --fatal-infos --fatal-warnings .
+
+      - name: Run tests
+        run: dart test
